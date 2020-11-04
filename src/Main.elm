@@ -3,7 +3,7 @@ import Browser
 import Html exposing (..)
 import Task
 import Time
-
+import Html.Attributes exposing (class,id)
 
 
 -- MAIN
@@ -25,13 +25,14 @@ main =
 type alias Model =
   { zone : Time.Zone
   , time : Time.Posix
+  , counter : Int
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model Time.utc (Time.millisToPosix 0)
-  , Task.perform AdjustTimeZone Time.here
+  ( Model Time.utc (Time.millisToPosix 0) 0 -- Model function arguments
+  , Task.perform AdjustTimeZone Time.here -- Cmd
   )
 
 
@@ -42,6 +43,8 @@ init _ =
 type Msg
   = Tick Time.Posix
   | AdjustTimeZone Time.Zone
+  | Increment
+  | Decrement
 
 
 
@@ -49,7 +52,7 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick newTime ->
-      ( { model | time = newTime }
+      ( { model | time = newTime } -- model return, but time is changed
       , Cmd.none
       )
 
@@ -57,7 +60,16 @@ update msg model =
       ( { model | zone = newZone }
       , Cmd.none
       )
-
+    Increment ->
+      (
+        { model | counter = model.counter+1}
+        , Cmd.none
+      )
+    Decrement ->
+      (
+        {model|counter = model.counter-1}
+        , Cmd.none
+      )
 
 
 -- SUBSCRIPTIONS
@@ -78,5 +90,12 @@ view model =
     hour   = String.fromInt (Time.toHour   model.zone model.time)
     minute = String.fromInt (Time.toMinute model.zone model.time)
     second = String.fromInt (Time.toSecond model.zone model.time)
+    count = String.fromInt (model.counter)
   in
-  h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+  div [id "main"]
+  [
+    h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+    ,h1 [class "test-counter"] [text(count)]
+
+  ]
+
