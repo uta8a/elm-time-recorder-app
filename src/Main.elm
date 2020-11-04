@@ -79,18 +79,29 @@ update msg model =
       )
     Save ->
       let
-        year = String.fromInt (Time.toYear model.zone model.app_start_time)
-        month = toIntMonth(Time.toMonth model.zone model.app_start_time)
-        day = String.fromInt (Time.toDay model.zone model.app_start_time)
-        hour   = String.fromInt (Time.toHour   model.zone model.app_start_time)
-        minute = String.fromInt (Time.toMinute model.zone model.app_start_time)
-        second = String.fromInt (Time.toSecond model.zone model.app_start_time)
+        year = String.padLeft 2 '0' (String.fromInt (Time.toYear model.zone model.app_start_time))
+        month = String.padLeft 2 '0' (toIntMonth(Time.toMonth model.zone model.app_start_time))
+        day = String.padLeft 2 '0' (String.fromInt (Time.toDay model.zone model.app_start_time))
+        hour   = String.padLeft 2 '0' (String.fromInt (Time.toHour   model.zone model.app_start_time))
+        minute = String.padLeft 2 '0' (String.fromInt (Time.toMinute model.zone model.app_start_time))
+        second = String.padLeft 2 '0' (String.fromInt (Time.toSecond model.zone model.app_start_time))
         title = year ++ "-" ++ month ++ "-" ++ day ++ "_" ++ hour ++ "-" ++ minute ++ "-" ++ second 
       in
       ( model
         ,record (E.object
           [ ("title", E.string title)
-          , ("body", E.int 42)
+          , ("body", E.object [
+              ("id1", E.object [
+                  ("task", E.string "ねこ")
+                , ("description", E.string "かわいいいきもの")
+                , ("duration", E.int 1000)
+              ] )
+            , ("id2", E.object [
+                  ("task", E.string "いぬ")
+                , ("description", E.string "ほえるいきもの")
+                , ("duration", E.int 1100)
+              ] )
+          ] )
           ])
       )
 toIntMonth : Month -> String
