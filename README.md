@@ -15,3 +15,7 @@ $ elm-app test # test
 - testのためのclassとスタイルのためのclassの名前空間を分離する。
 - testはclass `test-` プレフィックスをつける
 - HtmltoElmを使うと、HTML部分が楽
+- Test先と言っても、何もないときついので、Modelとかの定義部分を書いて中身を書く前にテスト書くみたいなノリがいいかもしれない。
+- CSSは今回は型つけないことにする
+- Backlog的にしたらいいかなと思ったけど、Project管理は別でやるのでシンプルさを大事にすることにした。
+- localStorageを使ったportができた

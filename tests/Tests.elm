@@ -11,16 +11,32 @@ import Test.Html.Selector exposing (containing, tag, text, class)
 
 viewTest : Test
 viewTest = 
-    describe "view test"
-        [ test "カウンタは0を表示している" <| 
-            \() ->
-                let z = init () |> Tuple.first
-                in
-                view z
-                    |> Query.fromHtml
-                    |> Query.find [class "test-counter"]
-                    |> Query.has [text "0"]
+    describe "view test" <|
+        [
+            describe "カウンタのテスト"
+            [ test "カウンタは0を表示している" <| 
+                \() ->
+                    let z = init () |> Tuple.first
+                    in
+                    view z
+                        |> Query.fromHtml
+                        |> Query.find [class "test-counter"]
+                        |> Query.has [text "0"]
+            ]
+            , describe "増減ボタン"
+            [
+                test "+ボタン" <|
+                 \() ->
+                    let z = init () |> Tuple.first
+                    in
+                    view z
+                        |> Query.fromHtml
+                        |> Query.find [tag "button", class "test-button-plus"]
+                        |> Event.simulate Event.click
+                        |> Event.expect Increment
+            ]
         ]
+        
 
 -- all : Test
 -- all =
