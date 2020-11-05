@@ -1,7 +1,7 @@
 {
-  "main.css": "https://uta8a.github.io/elm-time-recorder-app/static/css/main.a4758eab.chunk.css",
-  "main.js": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.2b1d87d2.chunk.js",
-  "main.js.map": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.2b1d87d2.chunk.js.map",
+  "main.css": "https://uta8a.github.io/elm-time-recorder-app/static/css/main.41da137b.chunk.css",
+  "main.js": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.638e74c6.chunk.js",
+  "main.js.map": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.638e74c6.chunk.js.map",
   "runtime~main.js": "https://uta8a.github.io/elm-time-recorder-app/static/js/runtime~main.039c87f0.js",
   "runtime~main.js.map": "https://uta8a.github.io/elm-time-recorder-app/static/js/runtime~main.039c87f0.js.map",
   "vendors~main.js": "https://uta8a.github.io/elm-time-recorder-app/static/js/vendors~main.bb36eb2f.chunk.js",
@@ -12,6 +12,6 @@
   "index.html": "https://uta8a.github.io/elm-time-recorder-app/index.html",
   "logo.svg": "https://uta8a.github.io/elm-time-recorder-app/logo.svg",
   "manifest.json": "https://uta8a.github.io/elm-time-recorder-app/manifest.json",
-  "precache-manifest.20a8c5c8b2bbcfbfdf35445d6d17edad.js": "https://uta8a.github.io/elm-time-recorder-app/precache-manifest.20a8c5c8b2bbcfbfdf35445d6d17edad.js",
+  "precache-manifest.1fe66e976cab52ef1faaacfb8ff1c28a.js": "https://uta8a.github.io/elm-time-recorder-app/precache-manifest.1fe66e976cab52ef1faaacfb8ff1c28a.js",
   "static/media/style.css": "https://uta8a.github.io/elm-time-recorder-app/static/media/Signika-Bold.157264bf.ttf"
 }
