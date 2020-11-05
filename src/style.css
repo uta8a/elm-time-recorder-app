@@ -1,0 +1,8 @@
+@font-face {
+	font-family: 'MyFont';
+	src: url("../public/Signika-Bold.ttf");
+}
+
+.clock {
+	font-family: MyFont;
+}

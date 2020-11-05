@@ -6,7 +6,8 @@ import Time exposing (Month (..))
 import Html.Attributes exposing (class,id)
 import Html.Events exposing (onClick)
 import Json.Encode as E
-
+import Array exposing (..)
+import Maybe exposing (withDefault)
 -- MAIN
 
 
@@ -26,18 +27,20 @@ type alias Todo =
   , last_modified: Time.Posix
   , delta: Int
   }
-
+type alias Message = 
+  { message: String }
 type alias Model =
   { zone : Time.Zone
   , time : Time.Posix
   , counter : Int
   , app_start_time: Time.Posix
+  , message_text: Message
   }
 
 
 init : Int -> (Model, Cmd Msg)
 init start_time =
-  ( Model Time.utc (Time.millisToPosix 0) 0 (Time.millisToPosix start_time) -- Model function arguments
+  ( Model Time.utc (Time.millisToPosix 0) 0 (Time.millisToPosix start_time) {message= "元気？"} -- Model function arguments
   , Task.perform AdjustTimeZone Time.here -- Cmd
   )
 
@@ -52,6 +55,7 @@ type Msg
   | Increment
   | Decrement
   | Save
+  | ChangeMessage Time.Posix
 
 
 
@@ -104,6 +108,17 @@ update msg model =
           ] )
           ])
       )
+    ChangeMessage newTime ->
+      let
+          cheerup_comment = ["やればできる！", "あんたならできるよ", "楽しくやっていきましょう", "うおおおお", "つらいときは休もう！", "疲れたら休憩！", "飽きたらお布団ダイブッ！！"]
+          index = modBy (length (fromList cheerup_comment)) (Time.toSecond model.zone model.time) 
+          text = {message = withDefault "元気？" (get index (fromList cheerup_comment))}
+      in
+      ( {model | message_text = text}
+      , Cmd.none
+      )
+      
+
 toIntMonth : Month -> String
 toIntMonth month =
   case month of
@@ -128,8 +143,10 @@ port record : E.Value -> Cmd msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 1000 Tick
-
+  Sub.batch [
+    Time.every 1000 Tick
+  , Time.every 1000 ChangeMessage
+  ]
 
 
 -- VIEW
@@ -138,18 +155,38 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   let
-    hour   = String.fromInt (Time.toHour   model.zone model.time)
-    minute = String.fromInt (Time.toMinute model.zone model.time)
-    second = String.fromInt (Time.toSecond model.zone model.time)
+    hour   = String.padLeft 2 '0' (String.fromInt (Time.toHour   model.zone model.time))
+    minute = String.padLeft 2 '0' (String.fromInt (Time.toMinute model.zone model.time))
+    second = String.padLeft 2 '0' (String.fromInt (Time.toSecond model.zone model.time))
     count = String.fromInt (model.counter)
+    message = model.message_text.message
   in
   div [id "main"]
   [
-      h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
-    , h1 [class "test-counter"] [text(count)]
-    , div [id "time"] [
-        button [class "test-button-plus", onClick Increment] [text "+"]
-      , button [class "test-counter-save", onClick Save] [text "Save"]
-    ]
+      div [id "message"] [
+        -- message changes randomly to cheer up User
+        h1 [class "message-text", class "text-center", class "pt-10", class "text-5xl"] [text message]
+      ]
+    , div [id "display-time"] [
+        -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
+        h1 [class "clock", class "text-center", class "pt-4", class "text-4xl"] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+      , div [id ""] [
+
+      ]
+      , h1 [class ""] []
+      ]
+    , div [id "todo-table"] [
+        -- todoのリスト
+      ]
+    , div [id "manage-data"] [
+        -- export/importを行うところ。ボタンで行う。
+        -- exportしたJSONファイルがたくさんできちゃうと思うので、そこは別routing(/data)でマージするサービスを提供する。
+      ]
+    -- , h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+    -- , h1 [class "test-counter"] [text(count)]
+    -- , div [id "time"] [
+    --     button [class "bb", class "test-button-plus", onClick Increment] [text "+"]
+    --   , button [class "test-counter-save", onClick Save] [text "Save"]
+    -- ]
   ]
 
