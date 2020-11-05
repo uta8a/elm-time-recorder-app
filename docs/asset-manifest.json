@@ -1,0 +1,17 @@
+{
+  "main.css": "/static/css/main.d7988ec8.chunk.css",
+  "main.js": "/static/js/main.7c88fc5a.chunk.js",
+  "main.js.map": "/static/js/main.7c88fc5a.chunk.js.map",
+  "runtime~main.js": "/static/js/runtime~main.1b922744.js",
+  "runtime~main.js.map": "/static/js/runtime~main.1b922744.js.map",
+  "vendors~main.js": "/static/js/vendors~main.bb36eb2f.chunk.js",
+  "vendors~main.js.map": "/static/js/vendors~main.bb36eb2f.chunk.js.map",
+  "./service-worker.js": "/./service-worker.js",
+  "Signika-Bold.ttf": "/Signika-Bold.ttf",
+  "favicon.ico": "/favicon.ico",
+  "index.html": "/index.html",
+  "logo.svg": "/logo.svg",
+  "manifest.json": "/manifest.json",
+  "precache-manifest.2d15ef58e60b2f30f78c93b768e10bc1.js": "/precache-manifest.2d15ef58e60b2f30f78c93b768e10bc1.js",
+  "static/media/style.css": "/static/media/Signika-Bold.157264bf.ttf"
+}
