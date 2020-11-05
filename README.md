@@ -41,7 +41,11 @@ $ elm-app test # test
   - fontはLicenseに気をつける
 - maybeという概念が出てきた。Optionみたいなものかな。
 - GitHub Pagesに反映されないけどこれのせいか？ `PUBLIC_URL=./ elm-app build` https://github.com/halfzebra/create-elm-app/blob/master/template/README.md
-
+- JSONを2つマージするときのデータの整合性はどうしようか。最後に編集したときを考えていたけど、これはファイル名からいけるので、いらないかも。(JSONマージするときに大きい方をとるか、合計するか選択できるといいね)
+- dataの持ち方が難しい。Durationも使えなさそう。Time.Posixで持っておいて、Intに直してhour, minute, secを取り出す方針で行きたい。(自前でやる)
+  - なんか便利があり解決 posixtomillisみたいなやつ
+- localStrageに毎秒記録する方針で行きたい
+- flags -> Date.now() -> これはIntなのでstart timeはIntとして処理されている
 
 ## log
 - 2020/11/04
@@ -52,3 +56,6 @@ $ elm-app test # test
   - まだできてないけどCSS的にはいい感じ(仮組みとしては上々)
   - 次はtodo部分の見た目CSSを作る
   - tailwindで吐き出したCSS、GitHub Pagesで必要だから入れたけど2.3MBもあって草
+  - durationやばそうなので、Todos周りをいい感じにしてからdurationにとりかかろう
+  - どんどん複雑になってきてやばいので、このへんで休憩して明日課題終えたらまたやってみる。
+  - text inputがマジでわからなくて困る。挙動が怪しい。
