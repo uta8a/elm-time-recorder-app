@@ -37,6 +37,8 @@ $ elm-app test # test
 - https://fonts.google.com/specimen/Signika?preview.text=01234567889&preview.text_type=custom&vfonly=true#standard-styles
   - fontはLicenseに気をつける
 - maybeという概念が出てきた。Optionみたいなものかな。
+- GitHub Pagesに反映されないけどこれのせいか？ `PUBLIC_URL=./ elm-app build` https://github.com/halfzebra/create-elm-app/blob/master/template/README.md
+
 
 ## log
 - 2020/11/04

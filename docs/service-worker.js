@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.2d15ef58e60b2f30f78c93b768e10bc1.js"
+  "https://uta8a.github.io/elm-time-recorder-app/precache-manifest.20a8c5c8b2bbcfbfdf35445d6d17edad.js"
 );
 
 workbox.core.skipWaiting();
