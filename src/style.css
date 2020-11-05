@@ -2,7 +2,9 @@
 	font-family: 'MyFont';
 	src: url("../public/Signika-Bold.ttf");
 }
-
+* {
+    box-sizing: border-box;
+}
 .clock {
 	font-family: MyFont;
 }

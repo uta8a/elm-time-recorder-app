@@ -167,13 +167,19 @@ view model =
         -- message changes randomly to cheer up User
         h1 [class "message-text", class "text-center", class "pt-10", class "text-5xl"] [text message]
       ]
-    , div [id "display-time"] [
+    , div [id "display-time", class "w-4/5", class "m-auto"] [
         -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
-        h1 [class "clock", class "text-center", class "pt-4", class "text-4xl"] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
-      , div [id ""] [
-
+        h1 [class "clock", class "text-center", class "pt-5", class "text-5xl"] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+      , div [id "todo-display", class "justify-center", class "flex", class "pt-1"] [
+          div [class "todo-display-name" , class "text-5xl"] [text "ねこ..."]
+        , div [class "todo-display-separator" , class "text-5xl", class "px-5"] [text ":"]
+        , div [class "todo-display-duration", class "text-5xl"] [text "00:30:33"]
       ]
-      , h1 [class ""] []
+      , div [id "start-stop-button", class "justify-center", class "flex", class "pt-5"] [
+          -- TODO Onclickで発火するようにしておく
+          button [class "button-start", class "text-5xl", class "px-4 mx-4", class "border-4 border-solid", class "hover:bg-green-400"] [text "▶"]
+        , button [class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400"] [text "⏸"]
+      ]
       ]
     , div [id "todo-table"] [
         -- todoのリスト
