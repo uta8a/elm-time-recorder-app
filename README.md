@@ -1,5 +1,8 @@
 # ElmTodoTimeApp
+- https://uta8a.github.io/elm-time-recorder-app/ から見ることができます。作りかけです。
+
 ```
+PUBLIC_URL="https://uta8a.github.io/elm-time-recorder-app/" elm-app build
 cp -r build docs # GitHub pages
 ```
 # License
