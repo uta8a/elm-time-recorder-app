@@ -46,3 +46,4 @@ $ elm-app test # test
   - Viewのdisplay-time部分を作っている
   - まだできてないけどCSS的にはいい感じ(仮組みとしては上々)
   - 次はtodo部分の見た目CSSを作る
+  - tailwindで吐き出したCSS、GitHub Pagesで必要だから入れたけど2.3MBもあって草
