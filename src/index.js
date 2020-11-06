@@ -8,6 +8,7 @@ let app = Elm.Main.init({
   flags: Date.now()
 });
 
+// because probably no useful handle for localStorage in Elm 
 app.ports.record.subscribe(
   (data) => {
     localStorage.setItem(`${data.title}.log`, JSON.stringify(data.body));

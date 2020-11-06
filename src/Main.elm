@@ -5,13 +5,13 @@ import Browser
 import Duration
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, on)
 import Json.Encode as E
 import Maybe exposing (withDefault)
 import String exposing (fromInt)
 import Task
 import Time exposing (Month(..), Zone, millisToPosix, posixToMillis)
-
+import Json.Decode as D
 
 
 -- MAIN
@@ -28,6 +28,10 @@ main =
 
 
 -- UTIL
+ifIsEnter : msg -> D.Decoder msg
+ifIsEnter msg =
+  D.field "key" D.string
+    |> D.andThen (\key -> if key == "Enter" then D.succeed msg else D.fail "some other key")
 -- MODEL
 
 
@@ -37,7 +41,6 @@ type alias Todo =
     , mounted_time : Time.Posix
     , id : Int
     }
-
 
 type alias Message =
     { message : String }
@@ -51,12 +54,14 @@ type alias Model =
     , message_text : Message
     , todos : List Todo
     , globalId : Int
+    , draft: String
+    
     }
 
 
 init : Int -> ( Model, Cmd Msg )
 init start_time =
-    ( Model Time.utc (Time.millisToPosix 0) 0 (millisToPosix start_time) (Message "元気？") [ Todo "default" 0 (millisToPosix start_time) -1 ] 0
+    ( Model Time.utc (Time.millisToPosix 0) 0 (millisToPosix start_time) (Message "元気？") [ Todo "default" 0 (millisToPosix start_time) -1 ] 0 ""
       -- Model function arguments
     , Task.perform AdjustTimeZone Time.here
       -- Cmd
@@ -75,9 +80,8 @@ type Msg
     | Save
     | ChangeMessage Time.Posix
     | NewTodo
-    | UpdateTodo String
-    | DeleteTodo
-
+    | DeleteTodo Int
+    | DraftChange String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -173,23 +177,22 @@ update msg model =
                     { model | globalId = model.globalId + 1 }
 
                 newModel =
-                    { preModel | todos = Todo "" 0 model.time model.globalId :: model.todos }
+                    { preModel | todos = Todo model.draft 0 model.time model.globalId :: model.todos }
             in
             ( newModel
             , Cmd.none
             )
 
-        UpdateTodo newTodo ->
+        DeleteTodo id ->
             let
                 newModel =
-                    { model | todos = List.map (elementChange model 1 newTodo) model.todos }
+                    { model | todos = List.filter (\x -> x.id /= id) model.todos }
             in
             ( newModel
             , Cmd.none
             )
-
-        DeleteTodo ->
-            ( model
+        DraftChange draft ->
+            ( {model | draft = draft}
             , Cmd.none
             )
 
@@ -246,7 +249,6 @@ toIntMonth month =
 port record : E.Value -> Cmd msg
 
 
-
 -- SUBSCRIPTIONS
 
 
@@ -273,10 +275,11 @@ genTr todo =
         -- second = String.padLeft 2 '0' (String.fromInt (Time.toSecond zone todo.delta))
     in
     tr []
-        [ td [ class "text-2xl border-8 border-green-400 text-center" ] [ input [ placeholder "New Todo", value todo.title, onInput UpdateTodo ] [] ]
+        [ td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (todo.title) ]
         , td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (fromInt (posixToMillis (millisToPosix 1604579860000))) ]
+        -- -- TODO delete button design
         , td []
-            [ button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl" ] [ text "x" ]
+            [ button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", onClick (DeleteTodo todo.id)] [ text "x" ]
             ]
         ]
 
@@ -301,13 +304,12 @@ view model =
 
         todos =
             model.todos
-
+        -- message_data message changes randomly to cheer up User
         message_data =
             div [ id "message-data" ]
-                [ -- message changes randomly to cheer up User
-                  h1 [ class "message-text", class "text-center", class "pt-10", class "text-5xl" ] [ text message ]
+                [ h1 [ class "message-text", class "text-center", class "pt-10", class "text-5xl" ] [ text message ]
                 ]
-
+        -- display current time and project:duration
         display_time =
             div [ id "display-time", class "w-4/5", class "m-auto" ]
                 [ -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
@@ -323,11 +325,18 @@ view model =
                     , button [ class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400" ] [ text "⏸" ]
                     ]
                 ]
-
+        -- todo input area
+        todo_input = 
+            div [] [
+                div [] [text "Add new todo and Enter"]
+                -- button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", class "mx-auto", onClick (NewTodo )] [ text "add todo" ]
+                , input [id "input-new-todo", placeholder "new todo name", on "keydown" (ifIsEnter NewTodo), onInput DraftChange, value model.draft ] []
+            ]
+        -- todo table and duration
         todo_table =
             div [ id "todo-table", class "flex flex-col justify-center w-3/5 mx-auto" ]
-                [ -- todoのリスト
-                  button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", class "mx-auto", onClick NewTodo ] [ text "add todo" ]
+                [ 
+                  todo_input
                 , table [ class "table-fixed mx-auto" ]
                     [ thead []
                         [ th [ class "border-green-400 border-8 w-1/2" ] [ text "Todo Name" ]
@@ -336,7 +345,7 @@ view model =
                     , tbody [] (List.map genTr todos)
                     ]
                 ]
-
+        -- export/import JSON data
         manage_data =
             div [ id "manage-data" ]
                 [-- export/importを行うところ。ボタンで行う。
