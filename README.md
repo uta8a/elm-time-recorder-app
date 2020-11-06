@@ -54,7 +54,11 @@ $ elm-app test # test
 0 matches found for this query.
 ```
 - `findAll [id "xxx"]` すると0を返す？
-- 
+- Elmでcontenteditableなtext-boxを作るのは難しそう？ https://stackoverflow.com/questions/58949541/elm-oninput-event-handler-not-working-on-contenteditable-element
+- 時間との兼ね合いから、今回はUpdateをなしにする。
+- NewTodo 引数 title
+- どうもつらいと思ったらDOM周りの関数がExposeされていないのかな？ https://stackoverflow.com/questions/62819593/get-elements-by-class-name-with-elm-browser-dom
+
 ## log
 - 2020/11/04
   - appつくりはじめた
@@ -72,4 +76,4 @@ $ elm-app test # test
   - 今日で完成させたいけどinputの挙動分からなさすぎる
 - 2020/11/07
   - 昨日は進捗報告回だったので完成できなかった。
-  - やること: テストでinみたいな方法と、
+  - todoのadd/deleteを実装した。すごく頭悪い方法だけど...(DOMベースの思考でやっていたけど、Elmだとデータ基本で考えるので自分の頭の悪さを自覚してトレーニングになる気がする)
