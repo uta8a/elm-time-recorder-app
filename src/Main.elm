@@ -5,13 +5,13 @@ import Browser
 import Duration
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Json.Encode as E
 import Maybe exposing (withDefault)
 import String exposing (fromInt)
 import Task
 import Time exposing (Month(..), Zone, millisToPosix, posixToMillis)
-import Html.Events exposing (onInput)
+
 
 
 -- MAIN
@@ -171,6 +171,7 @@ update msg model =
             let
                 preModel =
                     { model | globalId = model.globalId + 1 }
+
                 newModel =
                     { preModel | todos = Todo "" 0 model.time model.globalId :: model.todos }
             in
@@ -180,9 +181,9 @@ update msg model =
 
         UpdateTodo newTodo ->
             let
-                newModel = {model | todos = (List.map (elementChange model 1 newTodo) model.todos)}
+                newModel =
+                    { model | todos = List.map (elementChange model 1 newTodo) model.todos }
             in
-            
             ( newModel
             , Cmd.none
             )
@@ -192,13 +193,16 @@ update msg model =
             , Cmd.none
             )
 
+
 elementChange : Model -> Int -> String -> Todo -> Todo
 elementChange model id new_title todo =
     if todo.id == id then
-        (Todo new_title todo.delta model.time model.globalId)
+        Todo new_title todo.delta model.time model.globalId
+
     else
         todo
-    
+
+
 toIntMonth : Month -> Int
 toIntMonth month =
     case month of
@@ -269,11 +273,11 @@ genTr todo =
         -- second = String.padLeft 2 '0' (String.fromInt (Time.toSecond zone todo.delta))
     in
     tr []
-        [ td [class "text-2xl border-8 border-green-400 text-center"] [ input [ placeholder "New Todo", value todo.title, onInput UpdateTodo ][]]
-        , td [class "text-2xl border-8 border-green-400 text-center"] [ text (fromInt (posixToMillis (millisToPosix 1604579860000))) ]
-        , td [] [
-            button [class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl"] [text "x"]
-         ]
+        [ td [ class "text-2xl border-8 border-green-400 text-center" ] [ input [ placeholder "New Todo", value todo.title, onInput UpdateTodo ] [] ]
+        , td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (fromInt (posixToMillis (millisToPosix 1604579860000))) ]
+        , td []
+            [ button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl" ] [ text "x" ]
+            ]
         ]
 
 
@@ -297,47 +301,51 @@ view model =
 
         todos =
             model.todos
+
+        message_data =
+            div [ id "message-data" ]
+                [ -- message changes randomly to cheer up User
+                  h1 [ class "message-text", class "text-center", class "pt-10", class "text-5xl" ] [ text message ]
+                ]
+
+        display_time =
+            div [ id "display-time", class "w-4/5", class "m-auto" ]
+                [ -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
+                  h1 [ class "clock", class "text-center", class "pt-5", class "text-5xl" ] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+                , div [ id "todo-display", class "justify-center", class "flex", class "pt-1" ]
+                    [ div [ class "todo-display-name", class "text-5xl" ] [ text "ねこ..." ]
+                    , div [ class "todo-display-separator", class "text-5xl", class "px-5" ] [ text ":" ]
+                    , div [ class "todo-display-duration", class "text-5xl" ] [ text "00:30:33" ]
+                    ]
+                , div [ id "start-stop-button", class "justify-center", class "flex", class "pt-5" ]
+                    [ -- TODO Onclickで発火するようにしておく
+                      button [ class "button-start", class "text-5xl", class "px-4 mx-4", class "border-4 border-solid", class "hover:bg-green-400" ] [ text "▶" ]
+                    , button [ class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400" ] [ text "⏸" ]
+                    ]
+                ]
+
+        todo_table =
+            div [ id "todo-table", class "flex flex-col justify-center w-3/5 mx-auto" ]
+                [ -- todoのリスト
+                  button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", class "mx-auto", onClick NewTodo ] [ text "add todo" ]
+                , table [ class "table-fixed mx-auto" ]
+                    [ thead []
+                        [ th [ class "border-green-400 border-8 w-1/2" ] [ text "Todo Name" ]
+                        , th [ class "border-green-400 border-8 w-1/2" ] [ text "Duration" ]
+                        ]
+                    , tbody [] (List.map genTr todos)
+                    ]
+                ]
+
+        manage_data =
+            div [ id "manage-data" ]
+                [-- export/importを行うところ。ボタンで行う。
+                 -- exportしたJSONファイルがたくさんできちゃうと思うので、そこは別routing(/data)でマージするサービスを提供する。
+                ]
     in
     div [ id "main" ]
-        [ div [ id "message" ]
-            [ -- message changes randomly to cheer up User
-              h1 [ class "message-text", class "text-center", class "pt-10", class "text-5xl" ] [ text message ]
-            ]
-        , div [ id "display-time", class "w-4/5", class "m-auto" ]
-            [ -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
-              h1 [ class "clock", class "text-center", class "pt-5", class "text-5xl" ] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
-            , div [ id "todo-display", class "justify-center", class "flex", class "pt-1" ]
-                [ div [ class "todo-display-name", class "text-5xl" ] [ text "ねこ..." ]
-                , div [ class "todo-display-separator", class "text-5xl", class "px-5" ] [ text ":" ]
-                , div [ class "todo-display-duration", class "text-5xl" ] [ text "00:30:33" ]
-                ]
-            , div [ id "start-stop-button", class "justify-center", class "flex", class "pt-5" ]
-                [ -- TODO Onclickで発火するようにしておく
-                  button [ class "button-start", class "text-5xl", class "px-4 mx-4", class "border-4 border-solid", class "hover:bg-green-400" ] [ text "▶" ]
-                , button [ class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400" ] [ text "⏸" ]
-                ]
-            ]
-        -- , div [] [ text (String.fromInt (posixToMillis model.time)) ] -- debug
-        , div [ id "todo-table", class "flex flex-col justify-center w-3/5 mx-auto" ]
-            [ -- todoのリスト
-              button [class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", class "mx-auto", onClick NewTodo] [text "add todo"]
-            , table [class "table-fixed mx-auto"]
-                [ thead []
-                    [ th [class "border-green-400 border-8 w-1/2"] [ text "Todo Name" ]
-                    , th [class "border-green-400 border-8 w-1/2"] [ text "Duration" ]
-                    ]
-                , tbody [] (List.map genTr todos)
-                ]
-            ]
-        , div [ id "manage-data" ]
-            [-- export/importを行うところ。ボタンで行う。
-             -- exportしたJSONファイルがたくさんできちゃうと思うので、そこは別routing(/data)でマージするサービスを提供する。
-            ]
-
-        -- , h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
-        -- , h1 [class "test-counter"] [text(count)]
-        -- , div [id "time"] [
-        --     button [class "bb", class "test-button-plus", onClick Increment] [text "+"]
-        --   , button [class "test-counter-save", onClick Save] [text "Save"]
-        -- ]
+        [ message_data
+        , display_time
+        , todo_table
+        , manage_data
         ]

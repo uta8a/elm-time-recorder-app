@@ -46,7 +46,15 @@ $ elm-app test # test
   - なんか便利があり解決 posixtomillisみたいなやつ
 - localStrageに毎秒記録する方針で行きたい
 - flags -> Date.now() -> これはIntなのでstart timeはIntとして処理されている
+- viewでlet inできるみたいなのでcomponentっぽくできそう。
+- findAllが0を返すんだけど...
+```
+▼ Query.findAll [ attribute "id" "main" ]
 
+0 matches found for this query.
+```
+- `findAll [id "xxx"]` すると0を返す？
+- 
 ## log
 - 2020/11/04
   - appつくりはじめた
@@ -56,6 +64,12 @@ $ elm-app test # test
   - まだできてないけどCSS的にはいい感じ(仮組みとしては上々)
   - 次はtodo部分の見た目CSSを作る
   - tailwindで吐き出したCSS、GitHub Pagesで必要だから入れたけど2.3MBもあって草
+    - minifyを使う
   - durationやばそうなので、Todos周りをいい感じにしてからdurationにとりかかろう
   - どんどん複雑になってきてやばいので、このへんで休憩して明日課題終えたらまたやってみる。
   - text inputがマジでわからなくて困る。挙動が怪しい。
+- 2020/11/06
+  - 今日で完成させたいけどinputの挙動分からなさすぎる
+- 2020/11/07
+  - 昨日は進捗報告回だったので完成できなかった。
+  - やること: テストでinみたいな方法と、
