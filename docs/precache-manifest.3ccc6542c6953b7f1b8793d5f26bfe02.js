@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "https://uta8a.github.io/elm-time-recorder-app/favicon.ico"
   },
   {
-    "revision": "852035e31eac79598c698954df048369",
+    "revision": "666c7b636cb1da49bf836dd9a0609dc9",
     "url": "https://uta8a.github.io/elm-time-recorder-app/index.html"
   },
   {
@@ -20,12 +20,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "https://uta8a.github.io/elm-time-recorder-app/manifest.json"
   },
   {
-    "revision": "638e74c6011a246deea9",
+    "revision": "b46ba44495423906ad84",
     "url": "https://uta8a.github.io/elm-time-recorder-app/static/css/main.41da137b.chunk.css"
   },
   {
-    "revision": "638e74c6011a246deea9",
-    "url": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.638e74c6.chunk.js"
+    "revision": "b46ba44495423906ad84",
+    "url": "https://uta8a.github.io/elm-time-recorder-app/static/js/main.b46ba444.chunk.js"
   },
   {
     "revision": "039c87f086fb9c8b5d3e",
