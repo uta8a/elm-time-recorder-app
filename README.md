@@ -1,14 +1,21 @@
 # ElmTodoTimeApp
 - https://uta8a.github.io/elm-time-recorder-app/ から見ることができます。作りかけです。
+- 左の赤い `>>>` を選択して再生ボタンを押すと記録を開始します。
+- 一時停止ボタンで記録を一旦止めます。
+- リロードすると記録はすべて消えます。
 
-```
-PUBLIC_URL="https://uta8a.github.io/elm-time-recorder-app/" elm-app build
-cp -r build docs # GitHub pages
-```
+![img](https://raw.githubusercontent.com/uta8a/elm-time-recorder-app/master/readme-assets/img.gif)
+
+
 # License
 - Signika font(public/Signika-Bold.ttf): SIL OFL 1.1 (googlefont)
 - other code: MIT
 
+# build
+```
+PUBLIC_URL="https://uta8a.github.io/elm-time-recorder-app/" elm-app build
+cp -r build docs # GitHub pages
+```
 # Elm入門して消費時間記録サービス作る
 - 以下のようにやっていった(npmはいれている前提)
 ```shell
