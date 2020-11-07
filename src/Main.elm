@@ -32,6 +32,18 @@ ifIsEnter : msg -> D.Decoder msg
 ifIsEnter msg =
   D.field "key" D.string
     |> D.andThen (\key -> if key == "Enter" then D.succeed msg else D.fail "some other key")
+diffConvert : Int -> String
+diffConvert diff = 
+    let
+        hour = diff//(60*60*1000)
+        min = (diff - hour * 60 * 60 * 1000)//(60*1000)
+        sec  = (diff - hour* 60*60*1000 - min*60*1000)//1000
+    in
+        (String.fromInt hour) ++ ":" ++ String.padLeft 2 '0' (String.fromInt min) ++ ":" ++ String.padLeft 2 '0' (String.fromInt sec)
+        
+    
+
+
 -- MODEL
 
 
@@ -55,13 +67,14 @@ type alias Model =
     , todos : List Todo
     , globalId : Int
     , draft: String
-    
+    , now_todo_id: Int
+    , play: Bool
     }
 
 
 init : Int -> ( Model, Cmd Msg )
 init start_time =
-    ( Model Time.utc (Time.millisToPosix 0) 0 (millisToPosix start_time) (Message "元気？") [ Todo "default" 0 (millisToPosix start_time) -1 ] 0 ""
+    ( Model Time.utc (Time.millisToPosix 0) 0 (millisToPosix start_time) (Message "休憩は大事") [ Todo "休憩" 0 (millisToPosix start_time) 0 ] 1 "" 0 False
       -- Model function arguments
     , Task.perform AdjustTimeZone Time.here
       -- Cmd
@@ -82,6 +95,10 @@ type Msg
     | NewTodo
     | DeleteTodo Int
     | DraftChange String
+    | SelectTodo Int
+    | ComputeDuration Int Time.Posix
+    | PlayStart
+    | PlayStop
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -195,16 +212,23 @@ update msg model =
             ( {model | draft = draft}
             , Cmd.none
             )
-
-
-elementChange : Model -> Int -> String -> Todo -> Todo
-elementChange model id new_title todo =
-    if todo.id == id then
-        Todo new_title todo.delta model.time model.globalId
-
-    else
-        todo
-
+        SelectTodo id ->
+            ( {model|now_todo_id = id}
+            , Cmd.none
+            )
+        ComputeDuration id t ->
+            -- ( { model | todos = (List.map (\x -> if x.id == id && model.play then {x| delta = posixToMillis(model.time) - posixToMillis(x.mounted_time)} else x) model.todos) }
+            ( { model | todos = (List.map (\x -> if x.id == id && model.play then {x| delta = x.delta+1000} else x) model.todos) }
+            , Cmd.none
+            )
+        PlayStart -> 
+            ({model|play = True}
+            , Cmd.none
+            )
+        PlayStop -> 
+            ({model|play = False}
+            , Cmd.none
+            )    
 
 toIntMonth : Month -> Int
 toIntMonth month =
@@ -256,7 +280,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Time.every 1000 Tick
-        , Time.every 1000 ChangeMessage
+        , Time.every 60000 ChangeMessage
+        , Time.every 1000 (ComputeDuration model.now_todo_id)
         ]
 
 
@@ -264,8 +289,8 @@ subscriptions model =
 -- VIEW
 
 
-genTr : Todo -> Html Msg
-genTr todo =
+genTr : Model -> Todo -> Html Msg
+genTr model todo =
     let
         duration =
             todo.delta
@@ -275,11 +300,15 @@ genTr todo =
         -- second = String.padLeft 2 '0' (String.fromInt (Time.toSecond zone todo.delta))
     in
     tr []
-        [ td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (todo.title) ]
-        , td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (fromInt (posixToMillis (millisToPosix 1604579860000))) ]
+        [ td [class "bg-transparent text-red-700 font-semibold hover:text-white mr-3 px-3 rounded text-3xl"] [if todo.id == model.now_todo_id then (text "⭐") else (text "")]
+        , td []
+            [ button [ class "bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white mr-3 px-3 border border-red-500 hover:border-transparent rounded text-3xl", onClick (SelectTodo todo.id)] [ text ">>>" ]
+            ]
+        , td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (todo.title) ]
+        , td [ class "text-2xl border-8 border-green-400 text-center" ] [ text (diffConvert todo.delta) ]
         -- -- TODO delete button design
         , td []
-            [ button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", onClick (DeleteTodo todo.id)] [ text "x" ]
+            [ if todo.id /= 0 then (button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", onClick (DeleteTodo todo.id)] [ text "x" ]) else (div[][])
             ]
         ]
 
@@ -315,22 +344,22 @@ view model =
                 [ -- 今の時間の下に、プロジェクトとDurationと、その下に、記録ボタンと一時停止ボタンを置く
                   h1 [ class "clock", class "text-center", class "pt-5", class "text-5xl" ] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
                 , div [ id "todo-display", class "justify-center", class "flex", class "pt-1" ]
-                    [ div [ class "todo-display-name", class "text-5xl" ] [ text "ねこ..." ]
-                    , div [ class "todo-display-separator", class "text-5xl", class "px-5" ] [ text ":" ]
-                    , div [ class "todo-display-duration", class "text-5xl" ] [ text "00:30:33" ]
+                    [ div [ class "todo-display-name", class "text-5xl" ] [ text (withDefault (Todo "---" 0 (millisToPosix 0) 0) (List.head (List.filter (\x -> x.id ==model.now_todo_id) model.todos))).title ]
+                    , div [ class "todo-display-separator", class "text-5xl", class "px-5" ] [ text "🐈" ]
+                    , div [ class "todo-display-duration", class "text-5xl" ] [ text (diffConvert (withDefault (Todo "---" 0 (millisToPosix 0) 0) (List.head (List.filter (\x -> x.id ==model.now_todo_id) model.todos))).delta) ]
                     ]
                 , div [ id "start-stop-button", class "justify-center", class "flex", class "pt-5" ]
                     [ -- TODO Onclickで発火するようにしておく
-                      button [ class "button-start", class "text-5xl", class "px-4 mx-4", class "border-4 border-solid", class "hover:bg-green-400" ] [ text "▶" ]
-                    , button [ class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400" ] [ text "⏸" ]
+                      button [ class "button-start", class "text-5xl", class "px-4 mx-4", class "border-4 border-solid", class "hover:bg-green-400", onClick PlayStart] [ text "▶" ]
+                    , button [ class "button-stop", class "text-5xl", class "px-3 mx-4", class "border-4 border-solid", class "hover:bg-blue-400" , onClick PlayStop ] [ text "⏸" ]
                     ]
                 ]
         -- todo input area
         todo_input = 
-            div [] [
-                div [] [text "Add new todo and Enter"]
+            div [class "mx-auto"] [
+                div [class "text-2xl"] [text "🦍 < やることを入力してEnterキーを押してね"]
                 -- button [ class "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white ml-3 px-3 border border-blue-500 hover:border-transparent rounded text-3xl", class "mx-auto", onClick (NewTodo )] [ text "add todo" ]
-                , input [id "input-new-todo", placeholder "new todo name", on "keydown" (ifIsEnter NewTodo), onInput DraftChange, value model.draft ] []
+                , input [id "input-new-todo", class "text-2xl border border-blue-500 my-3", placeholder "やること", on "keydown" (ifIsEnter NewTodo), onInput DraftChange, value model.draft ] []
             ]
         -- todo table and duration
         todo_table =
@@ -339,10 +368,13 @@ view model =
                   todo_input
                 , table [ class "table-fixed mx-auto" ]
                     [ thead []
-                        [ th [ class "border-green-400 border-8 w-1/2" ] [ text "Todo Name" ]
+                        [ th [] []
+                        , th [] []
+                        , th [ class "border-green-400 border-8 w-1/2" ] [ text "Todo Name" ]
                         , th [ class "border-green-400 border-8 w-1/2" ] [ text "Duration" ]
+                        , th [] []
                         ]
-                    , tbody [] (List.map genTr todos)
+                    , tbody [] (List.map (genTr model) todos)
                     ]
                 ]
         -- export/import JSON data
