@@ -19,7 +19,7 @@ $ create-elm-app time-recorder
 $ cd time-recorder
 
 $ elm-app start # start local server
-$ elm-app build # build for production
+$ elm-app build # build for production to /build
 $ elm-app test # test 
 
 ```
@@ -58,6 +58,8 @@ $ elm-app test # test
 - 時間との兼ね合いから、今回はUpdateをなしにする。
 - NewTodo 引数 title
 - どうもつらいと思ったらDOM周りの関数がExposeされていないのかな？ https://stackoverflow.com/questions/62819593/get-elements-by-class-name-with-elm-browser-dom
+- video rec `$ ffmpeg -i 2020-11-07\ 08-48-26.mkv -vf crop=1228/2:890/2:20:10 out.rec.mp4`
+- 現在時刻を見に行かずに、毎秒1000加える実装に変更
 
 ## log
 - 2020/11/04
